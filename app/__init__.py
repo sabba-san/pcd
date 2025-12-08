@@ -1,16 +1,21 @@
 from flask import Flask
 
-# 1. Initialize the app globally (No create_app function)
-app = Flask(__name__)
+def create_app():
+    app = Flask(__name__)
+    
+    # REQUIRED for session to work
+    app.config['SECRET_KEY'] = 'dev_secret_key_123' 
 
-# 2. Register Module 1 (Login)
-from app.module1.routes import bp as module1_bp
-app.register_blueprint(module1_bp)
+    # 1. Register Login
+    from app.module1.routes import bp as module1_bp
+    app.register_blueprint(module1_bp)
 
-# 3. Register Module 2 (Chatbot)
-from app.module2.routes import bp as module2_bp
-app.register_blueprint(module2_bp)
+    # 2. Register Chatbot
+    from app.module2.routes import bp as module2_bp
+    app.register_blueprint(module2_bp)
 
-# 4. Register Module 3 (Defect Form)
-from app.module3.routes import bp as module3_bp
-app.register_blueprint(module3_bp)
+    # 3. Register Defect Form
+    from app.module3.routes import bp as module3_bp
+    app.register_blueprint(module3_bp)
+
+    return app

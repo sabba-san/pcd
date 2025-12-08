@@ -4,13 +4,14 @@
 <div class="row justify-content-center">
     <div class="col-lg-10">
         
-        <h2 class="fw-bold mb-1">Dashboard</h2>
-        <p class="text-muted mb-5">Welcome back, Abbas.</p>
+        <h2 class="fw-bold text-white mb-1">Dashboard</h2>
+        <p class="text-muted mb-5">Welcome back, {{ user if user else 'Abbas' }}.</p>
         
         <div class="row g-4">
+            
             <div class="col-md-6">
                 <a href="{{ url_for('module2.chatbot_ui') }}" class="text-decoration-none">
-                    <div class="card h-100 p-4 hover-effect">
+                    <div class="card h-100 p-4 border-0 hover-effect" style="background-color: #334155;">
                         <div class="card-body">
                             <div class="mb-4 d-flex justify-content-between align-items-center">
                                 <div class="bg-primary bg-opacity-10 p-3 rounded-3">
@@ -19,7 +20,7 @@
                                 <i class="bi bi-chevron-right text-muted"></i>
                             </div>
                             <h4 class="fw-bold text-white mb-2">Legal AI Consultation</h4>
-                            <p class="text-muted small">Instant HDA analysis for your defects.</p>
+                            <p class="text-white-50 small">Instant HDA analysis for your defects.</p>
                         </div>
                     </div>
                 </a>
@@ -27,7 +28,7 @@
 
             <div class="col-md-6">
                 <a href="{{ url_for('module3.show_form') }}" class="text-decoration-none">
-                    <div class="card h-100 p-4 hover-effect">
+                    <div class="card h-100 p-4 border-0 hover-effect" style="background-color: #334155;">
                         <div class="card-body">
                             <div class="mb-4 d-flex justify-content-between align-items-center">
                                 <div class="bg-warning bg-opacity-10 p-3 rounded-3">
@@ -36,7 +37,7 @@
                                 <i class="bi bi-chevron-right text-muted"></i>
                             </div>
                             <h4 class="fw-bold text-white mb-2">File Defect Claim</h4>
-                            <p class="text-muted small">Upload evidence and generate PDF.</p>
+                            <p class="text-white-50 small">Upload evidence and generate PDF.</p>
                         </div>
                     </div>
                 </a>
@@ -44,24 +45,28 @@
         </div>
 
         <div class="mt-5">
-            <h6 class="fw-bold text-muted text-uppercase small mb-3">Recent Activity</h6>
-            <div class="card p-0 overflow-hidden border-0">
-                <table class="table table-hover mb-0 align-middle" style="background-color: #334155; color: white;">
-                    <thead>
-                        <tr style="border-bottom: 1px solid #475569;">
-                            <th class="ps-4 py-3 text-muted fw-normal" style="background-color: #1e293b;">Project</th>
-                            <th class="text-muted fw-normal" style="background-color: #1e293b;">Date</th>
-                            <th class="text-muted fw-normal" style="background-color: #1e293b;">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="ps-4 fw-bold" style="background-color: #334155; color: white;">Master Bedroom Leak</td>
-                            <td class="text-muted" style="background-color: #334155;">Today</td>
-                            <td style="background-color: #334155;"><span class="badge bg-success bg-opacity-25 text-success rounded-pill px-3">Generated</span></td>
-                        </tr>
-                    </tbody>
-                </table>
+            <h6 class="fw-bold text-white-50 text-uppercase small mb-3">Recent Activity</h6>
+            <div class="card p-0 overflow-hidden border-0 shadow-lg" style="background-color: #334155;">
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover mb-0 align-middle" style="background-color: #334155;">
+                        <thead>
+                            <tr>
+                                <th class="ps-4 py-3 text-white-50 fw-normal small text-uppercase" style="background-color: #1e293b; border-bottom: 1px solid #475569;">Project</th>
+                                <th class="py-3 text-white-50 fw-normal small text-uppercase" style="background-color: #1e293b; border-bottom: 1px solid #475569;">Date</th>
+                                <th class="py-3 text-white-50 fw-normal small text-uppercase" style="background-color: #1e293b; border-bottom: 1px solid #475569;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="ps-4 fw-bold text-white" style="background-color: #334155; border-bottom: none;">Master Bedroom Leak</td>
+                                <td class="text-white-50 small" style="background-color: #334155; border-bottom: none;">Today</td>
+                                <td style="background-color: #334155; border-bottom: none;">
+                                    <span class="badge bg-success bg-opacity-25 text-success rounded-pill px-3">Generated</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -69,10 +74,13 @@
 </div>
 
 <style>
-    .hover-effect { transition: all 0.2s; }
+    .hover-effect { 
+        transition: transform 0.2s ease, background-color 0.2s ease; 
+    }
     .hover-effect:hover { 
-        background-color: #475569; 
-        transform: translateY(-3px);
+        background-color: #475569 !important; 
+        transform: translateY(-5px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
     }
 </style>
 {% endblock %}

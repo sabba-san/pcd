@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12">
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold text-white mb-0">Admin Dashboard</h2>
+                <p class="text-white-50 small">Overview of Homeowner defect claims</p>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-light btn-sm"><i class="bi bi-download me-2"></i>Export CSV</button>
+                <button class="btn btn-primary btn-sm"><i class="bi bi-arrow-clockwise me-2"></i>Refresh</button>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="card p-3 border-0 bg-primary bg-opacity-10">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-primary fw-bold text-uppercase small mb-1">Total Claims</p>
+                            <h3 class="fw-bold text-white m-0">12</h3>
+                        </div>
+                        <i class="bi bi-folder-fill fs-1 text-primary opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card p-3 border-0 bg-warning bg-opacity-10">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-warning fw-bold text-uppercase small mb-1">Pending Review</p>
+                            <h3 class="fw-bold text-white m-0">5</h3>
+                        </div>
+                        <i class="bi bi-hourglass-split fs-1 text-warning opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card p-3 border-0 bg-success bg-opacity-10">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-success fw-bold text-uppercase small mb-1">Resolved</p>
+                            <h3 class="fw-bold text-white m-0">7</h3>
+                        </div>
+                        <i class="bi bi-check-circle-fill fs-1 text-success opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-lg p-0 overflow-hidden" style="border: 1px solid #475569;">
+            <div class="card-header bg-transparent border-secondary p-3">
+                <h6 class="text-white m-0 fw-bold">Recent Submissions</h6>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-dark table-hover mb-0 align-middle" style="background-color: #334155;">
+                    <thead style="background-color: #0f172a;">
+                        <tr>
+                            <th class="py-3 ps-4 text-white-50 small text-uppercase" style="background-color: #0f172a;">Claim ID</th>
+                            <th class="py-3 text-white-50 small text-uppercase" style="background-color: #0f172a;">Owner / Unit</th>
+                            <th class="py-3 text-white-50 small text-uppercase" style="background-color: #0f172a;">Defect Type</th>
+                            <th class="py-3 text-white-50 small text-uppercase" style="background-color: #0f172a;">Date</th>
+                            <th class="py-3 text-white-50 small text-uppercase" style="background-color: #0f172a;">Status</th>
+                            <th class="py-3 text-end pe-4 text-white-50 small text-uppercase" style="background-color: #0f172a;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody style="border-top: none;">
+                        <tr style="border-bottom: 1px solid #475569;">
+                            <td class="ps-4 fw-bold text-white" style="background-color: #334155;">#CLM-2024-001</td>
+                            <td style="background-color: #334155;">
+                                <div class="fw-bold text-white">Ali Bin Abu</div>
+                                <div class="small text-white-50">Unit A-85</div>
+                            </td>
+                            <td style="background-color: #334155;"><span class="badge bg-danger bg-opacity-25 text-white px-2 py-1">Roof Leak</span></td>
+                            <td class="text-white-50 small" style="background-color: #334155;">Dec 08, 2025</td>
+                            <td style="background-color: #334155;"><span class="badge bg-warning text-dark">Pending</span></td>
+                            <td class="text-end pe-4" style="background-color: #334155;">
+                                <button class="btn btn-sm btn-outline-light">View Evidence</button>
+                            </td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #475569;">
+                            <td class="ps-4 fw-bold text-white" style="background-color: #334155;">#CLM-2024-002</td>
+                            <td style="background-color: #334155;">
+                                <div class="fw-bold text-white">Siti Aminah</div>
+                                <div class="small text-white-50">Unit B-12</div>
+                            </td>
+                            <td style="background-color: #334155;"><span class="badge bg-secondary bg-opacity-25 text-white px-2 py-1">Wall Crack</span></td>
+                            <td class="text-white-50 small" style="background-color: #334155;">Dec 07, 2025</td>
+                            <td style="background-color: #334155;"><span class="badge bg-info text-white">In Progress</span></td>
+                            <td class="text-end pe-4" style="background-color: #334155;">
+                                <button class="btn btn-sm btn-outline-light">View Evidence</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="ps-4 fw-bold text-white" style="background-color: #334155;">#CLM-2024-003</td>
+                            <td style="background-color: #334155;">
+                                <div class="fw-bold text-white">Chong Wei</div>
+                                <div class="small text-white-50">Unit C-05</div>
+                            </td>
+                            <td style="background-color: #334155;"><span class="badge bg-secondary bg-opacity-25 text-white px-2 py-1">Tile Pop-up</span></td>
+                            <td class="text-white-50 small" style="background-color: #334155;">Dec 05, 2025</td>
+                            <td style="background-color: #334155;"><span class="badge bg-success text-white">Resolved</span></td>
+                            <td class="text-end pe-4" style="background-color: #334155;">
+                                <button class="btn btn-sm btn-outline-light">View Evidence</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
