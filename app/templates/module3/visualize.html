@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block content %}
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
+
+<div class="row h-100">
+    
+    <div class="col-lg-9 p-0 position-relative bg-black" style="height: 85vh; border-radius: 12px; overflow: hidden;">
+        
+        <model-viewer 
+            src="{{ url_for('static', filename='uploads/' + filename) }}" 
+            alt="3D Lidar Scan"
+            auto-rotate
+            camera-controls
+            shadow-intensity="1"
+            style="width: 100%; height: 100%; background-color: #0f172a;">
+            
+            <button class="hotspot" slot="hotspot-1" data-position="-0.5 1.2 0.3" data-normal="1 0 0">
+                <div class="annotation">Wall Crack #1</div>
+            </button>
+            <button class="hotspot" slot="hotspot-2" data-position="0.8 2.5 -1.5" data-normal="0 1 0">
+                <div class="annotation">Leak #2</div>
+            </button>
+
+        </model-viewer>
+
+        <div class="position-absolute top-0 start-0 m-3">
+            <div class="badge bg-primary fs-6 px-3 py-2 shadow-sm">
+                <i class="bi bi-box-fill me-2"></i> Project: {{ project_name }}
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-lg-3 d-flex flex-column h-100 ps-4">
+        <h5 class="text-white fw-bold mb-3">Defect List</h5>
+        
+        <div class="card bg-dark border-secondary mb-3">
+            <div class="card-body">
+                <h6 class="text-danger fw-bold"><i class="bi bi-exclamation-circle me-2"></i>Wall Crack #1</h6>
+                <p class="text-muted small mb-2">Master Bedroom - North Wall</p>
+                <img src="https://via.placeholder.com/300x150?text=Crack+Photo" class="img-fluid rounded mb-2">
+                <button class="btn btn-sm btn-outline-light w-100">View Details</button>
+            </div>
+        </div>
+
+        <div class="card bg-dark border-secondary">
+            <div class="card-body">
+                <h6 class="text-warning fw-bold"><i class="bi bi-droplet-fill me-2"></i>Leak #2</h6>
+                <p class="text-muted small mb-2">Ceiling - Corner</p>
+                <button class="btn btn-sm btn-outline-light w-100">View Details</button>
+            </div>
+        </div>
+
+        <div class="mt-auto pt-3">
+            <a href="{{ url_for('module1.dashboard') }}" class="btn btn-secondary w-100">Exit Viewer</a>
+        </div>
+    </div>
+
+</div>
+
+<style>
+    .hotspot {
+        display: block;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: none;
+        background-color: #ff9800; /* Orange color */
+        box-shadow: 0 0 10px rgba(255, 152, 0, 0.8);
+        cursor: pointer;
+    }
+    .hotspot:hover { background-color: #ffc107; transform: scale(1.2); }
+
+    .annotation {
+        background: #333; color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px;
+        position: absolute; transform: translate(10px, 10px);
+        opacity: 0; transition: opacity 0.3s; pointer-events: none;
+    }
+    .hotspot:hover .annotation { opacity: 1; }
+</style>
+{% endblock %}
