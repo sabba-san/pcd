@@ -1,0 +1,94 @@
+
+so chat there 3 main users which is
+
+1.homeowner
+
+2.Lawyer
+
+3. House Developer
+
+
+
+now what task that they can do ?
+
+homeowner :
+
+chat with legal chatbot ai
+
+new scan Lidar @ new defect entry
+
+my project check whether defect and status
+
+view 3d visualizer
+
+
+
+what about lawyer and house developer ?
+
+//////////////////////////////////////////////////////
+
+
+Based on the modules you have built (Dashboard, Lidar Scan, 3D Visualizer, and Legal Chatbot), here is a logical breakdown of tasks for the Lawyer and House Developer.
+
+These tasks use the same system features but for different goals.
+
+2. Lawyer (The Legal Validator)
+Goal: To verify if the defect claims are legally valid under the Housing Development Act (HDA) and manage disputes.
+
+Review "Evidence Packages":
+
+Access the My Projects view to see their clients' cases.
+
+
+
+
+Open the Processing Report to verify if the Lidar scan and photos provide enough proof for a legal claim.
+
+
+
+Validate Defect Severity:
+
+Check the AI Confidence & Severity scores (e.g., "High Severity") to decide if a defect is worth pursuing a tribunal claim.
+
+
+
+HDA Clause Lookup:
+
+Use the Legal Chatbot to quickly pull up specific clauses regarding disputes or "Vacant Possession" dates to draft legal letters.
+
+
+
+
+Monitor Tribunal Deadlines:
+
+Track the dates in the system (e.g., "Scan Date: 2025-12-14") to ensure claims are filed within the 24-month DLP window.
+
+
+
+
+3. House Developer (The Fixer)
+Goal: To receive claims, verify them remotely (to save costs), and manage the repair teams.
+
+Manage Incoming Claims:
+
+View a Master Dashboard of all units (e.g., "ASMARINDA12", "Unit A-85") to see new defect submissions in real-time.
+
+
+
+
+
+Remote Inspection (Virtual Verification):
+
+Use the 3D Visualizer to look at the "Wall Crack #1" on the 3D model. This allows them to approve the defect without sending a worker to the site first.
+
+
+
+
+Update Repair Status:
+
+Change the status of a project from "Processing" to "In Progress" or "Repaired" so the homeowner sees the update on their dashboard.
+
+
+Review Defect Heatmaps:
+
+Look at the list of defects to see if there is a pattern (e.g., "Why do 10 units have leaking roofs?") to fix systemic construction issues.
