@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-white"><i class="bi bi-briefcase-fill me-2"></i>Legal Console</h2>
+            <p class="text-white-50">Role: <span class="text-info fw-bold">Legal Advisor</span> | Monitoring: 12 Active Cases</p>
+        </div>
+        <div>
+            <span class="badge bg-danger p-2"><i class="bi bi-bell-fill me-1"></i> 2 Urgent Reviews Needed</span>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+        
+        <div class="col-md-6">
+            <div class="card h-100 p-4 border-0" style="background-color: #1e1b4b;"> <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="text-white fw-bold">Legal Research Tool</h5>
+                        <p class="text-white-50 small mb-3">Search HDA clauses for "DLP Duration" or "Disputes".</p>
+                        <a href="{{ url_for('module4.chatbot_ui') }}" class="btn btn-outline-info btn-sm">
+                            <i class="bi bi-chat-dots me-2"></i> Open Legal Chatbot
+                        </a>
+                    </div>
+                    <i class="bi bi-journal-bookmark-fill fs-1 text-info opacity-25"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card h-100 p-4 border-0" style="background-color: #1e1b4b;">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="text-white fw-bold">Case Management</h5>
+                        <p class="text-white-50 small mb-3">Review full case files and lock evidence.</p>
+                        <a href="{{ url_for('module1.my_projects') }}" class="btn btn-outline-warning btn-sm">
+                            <i class="bi bi-folder-fill me-2"></i> View All Projects
+                        </a>
+                    </div>
+                    <i class="bi bi-archive-fill fs-1 text-warning opacity-25"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-lg" style="background-color: #334155;">
+        <div class="card-header bg-transparent border-secondary py-3">
+            <h5 class="text-white fw-bold mb-0">Pending Evidence Review</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-dark table-hover mb-0 align-middle">
+                <thead>
+                    <tr class="text-white-50 small text-uppercase">
+                        <th class="ps-4">Case ID</th>
+                        <th>Client / Project</th>
+                        <th>Defect Issue</th>
+                        <th>Severity</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for case in cases %}
+                    <tr>
+                        <td class="ps-4 text-info fw-bold">{{ case.id }}</td>
+                        <td>
+                            <div class="fw-bold">{{ case.client }}</div>
+                            <small class="text-muted">{{ case.project }}</small>
+                        </td>
+                        <td>{{ case.issue }}</td>
+                        <td>
+                            {% if case.severity == 'High' %}
+                                <span class="badge bg-danger">HIGH RISK</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">MEDIUM</span>
+                            {% endif %}
+                        </td>
+                        <td><span class="badge bg-secondary">{{ case.status }}</span></td>
+                        <td>
+                            <a href="{{ url_for('module3.visualize', filename=case.filename, project_name=case.client + ' Home') }}" 
+                               class="btn btn-sm btn-info fw-bold">
+                                <i class="bi bi-box-fill me-1"></i> Inspect 3D
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

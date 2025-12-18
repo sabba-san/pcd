@@ -1,12 +1,12 @@
 from flask import Blueprint, render_template, request, jsonify
 
-# Define the Blueprint with the static folder registered
-# No static_folder needed since we are using the global app/static
+# Define the Blueprint
 bp = Blueprint('module4', __name__, url_prefix='/module4')
 
 # --- ROUTE 1: Render the Chat Interface ---
-@bp.route('/chat', methods=['GET'])
-def chat_ui():
+# !!! CHANGED: Renamed function from 'chat_ui' to 'chatbot_ui' to match HTML !!!
+@bp.route('/chatbot', methods=['GET'])
+def chatbot_ui():
     # This loads the HTML file you just created
     return render_template('chatbot.html')
 
