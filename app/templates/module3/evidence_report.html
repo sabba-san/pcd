@@ -9,7 +9,8 @@
                 <i class="bi bi-arrow-left me-1"></i> Back to Console
             </a>
             <h2 class="fw-bold text-white mt-1">Evidence Review: {{ report.case_id }}</h2>
-            <p class="text-white-50">Client: <span class="text-info">{{ report.client }}</span> | Project: {{ report.project }}</p>
+            <p class="text-white-50">Client: <span class="text-info">{{ report.client }}</span> | Project: {{
+                report.project }}</p>
         </div>
         <div>
             <button class="btn btn-outline-light me-2"><i class="bi bi-printer me-2"></i>Export PDF</button>
@@ -18,7 +19,7 @@
     </div>
 
     <div class="row g-4">
-        
+
         <div class="col-md-4">
             <div class="card border-0 shadow-lg text-white" style="background-color: #1e293b;">
                 <div class="card-header bg-transparent border-secondary fw-bold text-uppercase small py-3">
@@ -26,20 +27,24 @@
                 </div>
                 <div class="card-body text-center py-5">
                     <div class="position-relative d-inline-block mb-3">
-                        <div class="rounded-circle border border-4 border-success d-flex align-items-center justify-content-center" 
-                             style="width: 120px; height: 120px; box-shadow: 0 0 15px rgba(74, 222, 128, 0.4);">
+                        <div class="rounded-circle border border-4 border-success d-flex align-items-center justify-content-center"
+                            style="width: 120px; height: 120px; box-shadow: 0 0 15px rgba(74, 222, 128, 0.4);">
                             <div>
                                 <h2 class="fw-bold mb-0 text-success">{{ report.ai_confidence }}%</h2>
                                 <small class="text-white-50" style="font-size: 10px;">CONFIDENCE</small>
                             </div>
                         </div>
                     </div>
-                    
+
                     <h5 class="fw-bold">AI Detection Status</h5>
-                    <p class="text-white-50 small px-4">The system has detected <strong class="text-white">2 Critical Defects</strong> with high certainty. Requires manual verification.</p>
-                    
-                    <div class="alert alert-danger bg-danger bg-opacity-10 border-danger mx-3 mt-4">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i> Risk Level: <strong>{{ report.risk_level }}</strong>
+                    <p class="text-white-50 small px-4">The system has detected <strong class="text-white">2 Critical
+                            Defects</strong> with high certainty. Requires manual verification.</p>
+
+                    <div
+                        class="alert bg-danger bg-opacity-25 border-danger mx-3 mt-4 d-flex align-items-center justify-content-center">
+                        <i class="bi bi-exclamation-triangle-fill text-danger me-2 fs-5"></i>
+                        <span class="text-white">Risk Level: <strong class="text-danger fw-bold ms-1 text-uppercase">{{
+                                report.risk_level }}</strong></span>
                     </div>
                 </div>
             </div>
@@ -65,9 +70,9 @@
                             {% for defect in report.defects %}
                             <tr>
                                 <td class="ps-4 py-3">
-                                    <img src="{{ url_for('static', filename='uploads/' + defect.img) }}" 
-                                         class="rounded border border-secondary" 
-                                         width="60" height="60" style="object-fit: cover;">
+                                    <img src="{{ url_for('static', filename='uploads/' + defect.img) }}"
+                                        class="rounded border border-secondary" width="60" height="60"
+                                        style="object-fit: cover;">
                                 </td>
                                 <td>
                                     <div class="fw-bold text-white">{{ defect.type }}</div>
@@ -75,20 +80,23 @@
                                 </td>
                                 <td>
                                     <div class="progress" style="height: 6px; width: 100px;">
-                                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ defect.confidence }}"></div>
+                                        <div class="progress-bar bg-success" role="progressbar"
+                                            style="width: {{ defect.confidence }}"></div>
                                     </div>
                                     <small class="text-success fw-bold">{{ defect.confidence }}</small>
                                 </td>
                                 <td>
                                     {% if defect.severity == 'High' %}
-                                        <span class="badge bg-danger">High</span>
+                                    <span class="badge bg-danger">High</span>
                                     {% else %}
-                                        <span class="badge bg-warning text-dark">Medium</span>
+                                    <span class="badge bg-warning text-dark">Medium</span>
                                     {% endif %}
                                 </td>
                                 <td class="text-end pe-4">
-                                    <button class="btn btn-sm btn-outline-success me-1" title="Confirm"><i class="bi bi-check-lg"></i></button>
-                                    <button class="btn btn-sm btn-outline-danger" title="Reject"><i class="bi bi-x-lg"></i></button>
+                                    <button class="btn btn-sm btn-outline-success me-1" title="Confirm"><i
+                                            class="bi bi-check-lg"></i></button>
+                                    <button class="btn btn-sm btn-outline-danger" title="Reject"><i
+                                            class="bi bi-x-lg"></i></button>
                                 </td>
                             </tr>
                             {% endfor %}

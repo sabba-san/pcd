@@ -61,17 +61,16 @@ def submit_defect():
 # --- 3. The 3D Visualizer ---
 @bp.route('/visualize')
 def visualize():
-    # Get parameters from URL
-    filename = request.args.get('filename', 'rumah sisiran.glb')
+    # Update default to your new file
+    filename = request.args.get('filename', 'sisiranRendered.glb') 
     project_name = request.args.get('project_name', 'Demo Project')
     back_to = request.args.get('back_to', 'homeowner')
     
-    # CHANGE THIS LINE: viewer.html -> visualize.html
+    # Ensure this matches your actual HTML file name (visualize.html or viewer.html)
     return render_template('module3/visualize.html', 
                            filename=filename, 
                            project_name=project_name,
                            back_to=back_to)
-    
     
     # --- 4. Evidence Review Report (Lawyer Task 1) ---
 @bp.route('/evidence_report')

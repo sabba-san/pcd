@@ -103,7 +103,6 @@ def my_projects():
     return render_template('module1/projects.html', projects=user_projects)
 
 # --- 7. LAWYER DASHBOARD ROUTE ---
-# I kept ONLY the correct version below
 @bp.route('/lawyer_dashboard')
 def lawyer_dashboard():
     # Mock data for the lawyer's active cases
@@ -115,7 +114,8 @@ def lawyer_dashboard():
             "issue": "Structural Wall Crack", 
             "severity": "High", 
             "status": "Pending Review",
-            "filename": "rumah sisiran.glb" 
+            # UPDATE THIS LINE 👇
+            "filename": "sisiranRendered.glb" 
         },
         {
             "id": "CASE-004", 
@@ -124,11 +124,11 @@ def lawyer_dashboard():
             "issue": "Roof Leakage", 
             "severity": "Medium", 
             "status": "Evidence Verified",
-            "filename": "rumah sisiran.glb"
+            # UPDATE THIS LINE TOO 👇
+            "filename": "sisiranRendered.glb"
         }
     ]
     
-    # Passes 'Pn. Zulaikha' so the header is correct
     return render_template('module1/lawyer_dashboard.html', 
                            cases=urgent_cases, 
                            user="Pn. Zulaikha")
