@@ -58,19 +58,51 @@ def submit_defect():
         filename=filename
     )
 
-# -------------------------------------------------
-# ROUTE 3: 3D Visualizer Page
-# -------------------------------------------------
-@bp.route('/visualize', methods=['GET'])
+# --- 3. The 3D Visualizer ---
+@bp.route('/visualize')
 def visualize():
-    """
-    Render the 3D visualizer page
-    """
-    filename = request.args.get('filename', 'default.glb')
+    # Get parameters from URL
+    filename = request.args.get('filename', 'rumah sisiran.glb')
     project_name = request.args.get('project_name', 'Demo Project')
-
-    return render_template(
-        'module3/visualize.html',
-        filename=filename,
-        project_name=project_name
-    )
+    back_to = request.args.get('back_to', 'homeowner')
+    
+    # CHANGE THIS LINE: viewer.html -> visualize.html
+    return render_template('module3/visualize.html', 
+                           filename=filename, 
+                           project_name=project_name,
+                           back_to=back_to)
+    
+    
+    # --- 4. Evidence Review Report (Lawyer Task 1) ---
+@bp.route('/evidence_report')
+def evidence_report():
+    # Mock Data for the specific case (CASE-001)
+    report_data = {
+        "case_id": "CASE-001",
+        "client": "Abbas Abu Dzarr",
+        "project": "ASMARINDA12",
+        "submission_date": "2025-12-14",
+        "ai_confidence": 98,  # Overall AI score
+        "risk_level": "High",
+        "defects": [
+            {
+                "id": "D-101",
+                "type": "Structural Wall Crack",
+                "location": "Master Bedroom - North Wall",
+                "severity": "High",
+                "confidence": "99%",
+                "img": "leak_01.jpg", # Uses your existing demo image
+                "status": "Auto-Detected"
+            },
+            {
+                "id": "D-102",
+                "type": "Water Mark / Dampness",
+                "location": "Ceiling - Corner",
+                "severity": "Medium",
+                "confidence": "85%",
+                "img": "leak_01.jpg",
+                "status": "Auto-Detected"
+            }
+        ]
+    }
+    return render_template('module3/evidence_report.html', report=report_data)

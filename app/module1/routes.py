@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session
 
-# Use your original Blueprint definition (no prefix, as in your original code)
+# Use your original Blueprint definition (no prefix)
 bp = Blueprint('module1', __name__)
 
 # --- 1. Login Page Display ---
@@ -21,13 +21,13 @@ def login_auth():
         session['user_name'] = 'System Administrator'
         return redirect(url_for('module1.admin_dashboard'))
     
-    # 2. HOUSING DEVELOPER LOGIN
+    # HOUSING DEVELOPER CHECK
     elif email == 'developer@ecoworld.com' and password == 'dev123':
         session['user_role'] = 'developer'
         session['user_name'] = 'EcoWorld Contractor'
         return redirect(url_for('module1.developer_portal'))
     
-    # 3. LAWYER CHECK (*** NEW ADDITION ***)
+    # LAWYER CHECK
     elif email == 'lawyer@firm.com' and password == 'law123':
         session['user_role'] = 'lawyer'
         session['user_name'] = 'Pn. Zulaikha'
@@ -63,7 +63,7 @@ def developer_portal():
     
     return render_template('developer_portal.html', user=session.get('user_name'))
 
-# --- 6. My Projects Route (*** NEW ADDITION ***) ---
+# --- 6. My Projects Route ---
 @bp.route('/projects')
 def my_projects():
     # Dummy data to match your design
@@ -76,7 +76,7 @@ def my_projects():
             "address": "Sisiran Sintok 1b, 06050 Changlun, Kedah",
             "defects": 5,
             "status": "Processing",
-            "filename": "rumah sisiran.glb"  # Ensure this file is in app/static/uploads/
+            "filename": "rumah sisiran.glb" 
         },
         {
             "id": "39",
@@ -102,7 +102,8 @@ def my_projects():
     
     return render_template('module1/projects.html', projects=user_projects)
 
-# --- 7. LAWYER DASHBOARD ROUTE (*** NEW ADDITION ***) ---
+# --- 7. LAWYER DASHBOARD ROUTE ---
+# I kept ONLY the correct version below
 @bp.route('/lawyer_dashboard')
 def lawyer_dashboard():
     # Mock data for the lawyer's active cases
@@ -114,7 +115,7 @@ def lawyer_dashboard():
             "issue": "Structural Wall Crack", 
             "severity": "High", 
             "status": "Pending Review",
-            "filename": "rumah sisiran.glb" # Uses your existing demo file
+            "filename": "rumah sisiran.glb" 
         },
         {
             "id": "CASE-004", 
@@ -127,4 +128,7 @@ def lawyer_dashboard():
         }
     ]
     
-    return render_template('module1/lawyer_dashboard.html', cases=urgent_cases)
+    # Passes 'Pn. Zulaikha' so the header is correct
+    return render_template('module1/lawyer_dashboard.html', 
+                           cases=urgent_cases, 
+                           user="Pn. Zulaikha")
