@@ -2,75 +2,76 @@
 
 {% block content %}
 <style>
-    /* --- USER'S CUSTOM STYLES --- */
-    /* Chat-Specific Styles to override/enhance base */
+    /* --- SIDEBAR CHAT STYLES --- */
     .chat-container {
-        height: calc(100vh - 140px); /* Fill remaining screen height */
+        height: calc(100vh - 140px);
         border: 1px solid #475569;
         border-radius: 12px;
         overflow: hidden;
-        background-color: #1e293b; /* Ensure dark background */
+        background-color: #1e293b;
     }
 
-    /* Sidebar Styles */
     .chat-sidebar {
-        background-color: #0f172a; /* Darker than card */
+        background-color: #0f172a;
         border-right: 1px solid #475569;
     }
 
     .chat-list-item {
-        color: #94a3b8; /* Text secondary */
+        color: #94a3b8;
         border-radius: 8px;
         transition: 0.2s;
         border: 1px solid transparent;
+        text-decoration: none;
     }
 
     .chat-list-item:hover,
     .chat-list-item.active {
         background-color: rgba(59, 130, 246, 0.1);
         border-color: rgba(59, 130, 246, 0.3);
-        color: #3b82f6; /* Accent blue */
+        color: #3b82f6;
     }
 
-    /* Message Area */
     .chat-messages {
-        background-color: #0f172a; /* Match body bg for contrast */
+        background-color: #0f172a;
         overflow-y: auto;
     }
 
-    /* Custom Scrollbar */
-    .chat-messages::-webkit-scrollbar { width: 6px; }
-    .chat-messages::-webkit-scrollbar-thumb { background-color: #475569; border-radius: 3px; }
+    .chat-messages::-webkit-scrollbar {
+        width: 6px;
+    }
 
- /* Bubbles */
+    .chat-messages::-webkit-scrollbar-thumb {
+        background-color: #475569;
+        border-radius: 3px;
+    }
+
     .msg {
         max-width: 75%;
-        width: fit-content;  /* <--- THIS FIXES THE "HI" SIZE ISSUE */
+        width: fit-content;
         padding: 12px 16px;
         border-radius: 12px;
         margin-bottom: 15px;
         line-height: 1.5;
         font-size: 0.95rem;
-        position: relative;
-        word-wrap: break-word; /* Ensures long words don't break the layout */
+        word-wrap: break-word;
     }
 
     .msg-bot {
-        background-color: #1e293b; /* Lighter slate */
-        color: #f1f5f9; /* Text main */
+        background-color: #1e293b;
+        color: #f1f5f9;
         border: 1px solid #475569;
         border-top-left-radius: 2px;
         margin-right: auto;
     }
 
     .msg-user {
-        background-color: #3b82f6; /* Blue */
+        background-color: #3b82f6;
         color: white;
         border-top-right-radius: 2px;
         margin-left: auto;
     }
 
-    /* Quick Action Chips */
+    /* Chips */
     .quick-actions {
         display: flex;
         gap: 10px;
@@ -79,7 +80,10 @@
         margin-bottom: 10px;
         scrollbar-width: none;
     }
-    .quick-actions::-webkit-scrollbar { display: none; }
+
+    .quick-actions::-webkit-scrollbar {
+        display: none;
+    }
 
     .chip {
         background-color: #1e293b;
@@ -90,7 +94,6 @@
         font-size: 0.85rem;
         white-space: nowrap;
         cursor: pointer;
-        transition: 0.2s;
         display: flex;
         align-items: center;
         gap: 8px;
@@ -101,9 +104,11 @@
         color: #3b82f6;
         background-color: rgba(59, 130, 246, 0.1);
     }
-    .chip i { color: #3b82f6; }
 
-    /* Input Area */
+    .chip i {
+        color: #3b82f6;
+    }
+
     .chat-input-area {
         background-color: #0f172a;
         border-top: 1px solid #475569;
@@ -121,73 +126,79 @@
 
                 <p class="text-muted small fw-bold text-uppercase mb-2" style="font-size: 0.7rem;">Recent Inquiries</p>
                 <div class="d-flex flex-column gap-1">
-                    <a href="#" class="chat-list-item p-2 text-decoration-none active d-flex align-items-center gap-2">
-                        <i class="bi bi-chat-dots-fill"></i>
-                        <span class="text-truncate">Roof Leaking Issue</span>
-                    </a>
-                    <a href="#" class="chat-list-item p-2 text-decoration-none d-flex align-items-center gap-2">
-                        <i class="bi bi-chat-left"></i>
-                        <span class="text-truncate">Wall Crack in Master Bed...</span>
+                    <a href="#" class="chat-list-item p-2 active d-flex align-items-center gap-2">
+                        <i class="bi bi-chat-dots-fill"></i> <span class="text-truncate">Roof Leaking Issue</span>
                     </a>
                 </div>
 
                 <div class="mt-auto">
-                    <div class="p-3 rounded-3" style="background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2);">
-                        <small class="text-primary fw-bold d-block mb-1"><i class="bi bi-info-circle me-1"></i> Did you know?</small>
-                        <small class="text-muted" style="font-size: 0.75rem;">Your DLP coverage is 24 months from the Vacant Possession date.</small>
+                    <div class="p-3 rounded-3"
+                        style="background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2);">
+                        <small class="text-primary fw-bold d-block mb-1"><i class="bi bi-info-circle me-1"></i> Did you
+                            know?</small>
+                        <small class="text-muted" style="font-size: 0.75rem;">Your DLP coverage is 24 months from Vacant
+                            Possession.</small>
                     </div>
                 </div>
             </div>
 
             <div class="d-flex flex-column flex-grow-1">
 
-                <div class="p-3 border-bottom border-secondary d-flex align-items-center justify-content-between" style="background: #1e293b;">
+                <div class="p-3 border-bottom border-secondary d-flex align-items-center justify-content-between"
+                    style="background: #1e293b;">
                     <div class="d-flex align-items-center gap-3">
                         <div class="bg-primary bg-opacity-10 p-2 rounded-circle text-primary">
                             <i class="bi bi-robot fs-5"></i>
                         </div>
                         <div>
                             <h6 class="mb-0 text-white">DLP Legal Assistant</h6>
-                            <small class="text-success"><i class="bi bi-circle-fill" style="font-size: 8px;"></i> Online • Trained on HDA 1966</small>
+                            <small class="text-success">
+                                <i class="bi bi-circle-fill" style="font-size: 8px;"></i> Online • {{ user }} ({{ badge
+                                }})
+                            </small>
                         </div>
                     </div>
-                    <button class="btn btn-outline-secondary btn-sm border-0"><i class="bi bi-three-dots-vertical"></i></button>
+
+                    {% if user == 'Pn. Zulaikha' %}
+                    <a href="{{ url_for('module1.lawyer_dashboard') }}"
+                        class="btn btn-outline-secondary btn-sm border-0"><i class="bi bi-x-lg"></i></a>
+                    {% else %}
+                    <a href="{{ url_for('module1.dashboard') }}" class="btn btn-outline-secondary btn-sm border-0"><i
+                            class="bi bi-x-lg"></i></a>
+                    {% endif %}
                 </div>
 
                 <div class="chat-messages flex-grow-1 p-4" id="chatBox">
                     <div class="msg msg-bot">
                         <div class="d-flex align-items-center gap-2 mb-1">
-                            <i class="bi bi-robot text-primary"></i> <small class="fw-bold opacity-75">AI Assistant</small>
+                            <i class="bi bi-robot text-primary"></i> <small class="fw-bold opacity-75">AI
+                                Assistant</small>
                         </div>
-                        Hello <b>{{ user if user else 'Abbas' }}</b>. I am your automated legal consultant.<br><br>
-                        I can explain your rights regarding defects, the timeline for repairs, and Tribunal procedures. How can I help?
+                        Hello <b>{{ user }}</b>. I am your automated legal consultant.<br><br>
+                        I can explain your rights regarding defects, the timeline for repairs, and Tribunal procedures.
+                        How can I help?
                     </div>
                 </div>
 
                 <div class="chat-input-area p-3">
-                    
                     <div class="quick-actions">
-                        <div class="chip" onclick="submitMessage('Is a cracked wall covered?')">
-                            <i class="bi bi-bricks"></i> Cracked Wall
-                        </div>
-                        <div class="chip" onclick="submitMessage('How long is the DLP?')">
-                            <i class="bi bi-clock-history"></i> DLP Duration
-                        </div>
-                        <div class="chip" onclick="submitMessage('Developer refuses to fix')">
-                            <i class="bi bi-exclamation-triangle"></i> Dispute
-                        </div>
-                        <div class="chip" onclick="submitMessage('What is Vacant Possession?')">
-                            <i class="bi bi-key"></i> Vacant Possession
-                        </div>
+                        <div class="chip" onclick="submitMessage('Is a cracked wall covered?')"><i
+                                class="bi bi-bricks"></i> Cracked Wall</div>
+                        <div class="chip" onclick="submitMessage('How long is the DLP?')"><i
+                                class="bi bi-clock-history"></i> DLP Duration</div>
+                        <div class="chip" onclick="submitMessage('Developer refuses to fix')"><i
+                                class="bi bi-exclamation-triangle"></i> Dispute</div>
                     </div>
 
                     <div class="input-group">
-                        <input type="text" id="userInput" class="form-control border-secondary" placeholder="Type your legal question here..." style="background: #1e293b; color: white;">
-                        <button class="btn btn-primary px-4" onclick="handleSendClick()"><i class="bi bi-send-fill"></i></button>
+                        <input type="text" id="userInput" class="form-control border-secondary"
+                            placeholder="Type your legal question here..." style="background: #1e293b; color: white;">
+                        <button class="btn btn-primary px-4" onclick="handleSendClick()"><i
+                                class="bi bi-send-fill"></i></button>
                     </div>
-                    
                     <div class="text-center mt-2">
-                        <small class="text-muted" style="font-size: 0.7rem;">AI can make mistakes. Please verify with a real lawyer.</small>
+                        <small class="text-muted" style="font-size: 0.7rem;">AI can make mistakes. Please verify with a
+                            real lawyer.</small>
                     </div>
                 </div>
 
@@ -197,58 +208,55 @@
 </div>
 
 <script>
-    // 1. Handle "Send" Button Click
+    // 1. Handle Send
     function handleSendClick() {
         const input = document.getElementById('userInput');
         const text = input.value.trim();
         if (text) {
             submitMessage(text);
-            input.value = ""; // Clear input
+            input.value = "";
         }
     }
 
-    // 2. Handle "Enter" Key
+    // 2. Handle Enter Key
     document.getElementById("userInput").addEventListener("keypress", function (event) {
         if (event.key === "Enter") handleSendClick();
     });
 
-    // 3. MAIN LOGIC: Send to Python Backend
+    // 3. MAIN LOGIC
     function submitMessage(text) {
         const chatBox = document.getElementById('chatBox');
 
-        // A. Add USER Message to Screen
+        // Add User Message
         const userDiv = document.createElement('div');
         userDiv.className = 'msg msg-user';
         userDiv.innerText = text;
         chatBox.appendChild(userDiv);
-        chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll
+        chatBox.scrollTop = chatBox.scrollHeight;
 
-        // B. Send to Python (Module 4 Routes)
+        // Send to Backend
         fetch("{{ url_for('module4.chat_response') }}", {
             method: "POST",
-            headers: {'Content-Type': 'application/json'},
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message: text })
         })
-        .then(response => response.json())
-        .then(data => {
-            // C. Add BOT Response to Screen
-            const botDiv = document.createElement('div');
-            botDiv.className = 'msg msg-bot';
-            
-            // Header for Bot Bubble
-            const botHeader = `<div class="d-flex align-items-center gap-2 mb-1"><i class="bi bi-robot text-primary"></i> <small class="fw-bold opacity-75">AI Assistant</small></div>`;
-            
-            botDiv.innerHTML = botHeader + data.reply; // Insert HTML (allows <b> and <br>)
-            chatBox.appendChild(botDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'msg msg-bot text-danger';
-            errorDiv.innerText = "Error: Could not connect to the Legal Brain.";
-            chatBox.appendChild(errorDiv);
-        });
+            .then(response => response.json())
+            .then(data => {
+                // Add Bot Response
+                const botDiv = document.createElement('div');
+                botDiv.className = 'msg msg-bot';
+                const botHeader = `<div class="d-flex align-items-center gap-2 mb-1"><i class="bi bi-robot text-primary"></i> <small class="fw-bold opacity-75">AI Assistant</small></div>`;
+                botDiv.innerHTML = botHeader + data.reply;
+                chatBox.appendChild(botDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'msg msg-bot text-danger';
+                errorDiv.innerText = "Error: Could not connect to backend.";
+                chatBox.appendChild(errorDiv);
+            });
     }
 </script>
 

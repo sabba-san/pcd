@@ -4,12 +4,19 @@ from flask import Blueprint, render_template, request, jsonify
 bp = Blueprint('module4', __name__, url_prefix='/module4')
 
 # --- ROUTE 1: Render the Chat Interface ---
-# !!! CHANGED: Renamed function from 'chat_ui' to 'chatbot_ui' to match HTML !!!
 @bp.route('/chatbot', methods=['GET'])
 def chatbot_ui():
-    # This loads the HTML file you just created
-    return render_template('chatbot.html')
-
+    # Check URL for role parameter (default to homeowner if missing)
+    role = request.args.get('role', 'homeowner')
+    
+    if role == 'lawyer':
+        user_name = "Pn. Zulaikha"
+        user_badge = "Legal Advisor"
+    else:
+        user_name = "Abbas Abu Dzarr"
+        user_badge = "Unit A-85"
+        
+    return render_template('chatbot.html', user=user_name, badge=user_badge)
 # --- ROUTE 2: The AI Processing Logic ---
 @bp.route('/response', methods=['POST'])
 def chat_response():
