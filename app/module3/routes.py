@@ -111,7 +111,8 @@ def lock_evidence(id):
 
 # ... existing lock_evidence route ...
 
-# --- NEW ROUTE: VALIDATE ALL (BULK LOCK) ---
+# app/module3/routes.py
+
 @bp.route('/validate_all', methods=['POST'])
 def validate_all():
     db = get_db()
@@ -120,8 +121,8 @@ def validate_all():
     db.execute("UPDATE defects SET status = 'locked' WHERE status = 'draft'")
     db.commit()
     
-    # Refresh the page
-    return redirect(url_for('module3.evidence_report'))
+    # CHANGE: Redirect back to the LAWYER DASHBOARD
+    return redirect(url_for('module1.lawyer_dashboard'))
 # -------------------------------------------------
 # ROUTE 5: 3D Visualizer
 # -------------------------------------------------
