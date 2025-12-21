@@ -2,24 +2,16 @@ from flask import Blueprint, render_template, request, g, redirect, url_for
 import sqlite3
 import os
 
-# -------------------------------------------------
-# 1. Define Blueprint & Database Config
-# -------------------------------------------------
 bp = Blueprint('module3', __name__, url_prefix='/module3')
 
-# Calculate the path to your main 'pcd' folder
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DATABASE = os.path.join(BASE_DIR, 'app.db')
 
-# --- THE FIX IS HERE 👇 ---
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
         db = g._database = sqlite3.connect(DATABASE)
-        db.row_factory = sqlite3.Row 
-        
-        # AUTO-CREATE TABLE if it doesn't exist
-        # This guarantees the table exists before you try to save anything
+        db.row_factory = sqlite3.Row
         db.execute('''
             CREATE TABLE IF NOT EXISTS defects (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -31,9 +23,7 @@ def get_db():
             )
         ''')
         db.commit()
-
     return db
-# ---------------------------
 
 @bp.teardown_request
 def close_connection(exception):
@@ -41,23 +31,17 @@ def close_connection(exception):
     if db is not None:
         db.close()
 
-# -------------------------------------------------
-# ROUTE 1: Display Insert Defect Form
-# -------------------------------------------------
+# 1. Insert Defect
 @bp.route('/insert_defect', methods=['GET'])
 def insert_defect():
     return render_template('module3/insert_defect.html')
 
-# -------------------------------------------------
-# ROUTE 2: Handle Form Submission (Saves to DB)
-# -------------------------------------------------
+# 2. Submit Defect
 @bp.route('/submit_defect', methods=['POST'])
 def submit_defect():
     project_name = request.form.get('project_name')
-    owner_name = request.form.get('owner_name')
     unit_no = request.form.get('unit_no')
     
-    # Save File
     upload_folder = os.path.join(os.getcwd(), 'app', 'static', 'uploads')
     os.makedirs(upload_folder, exist_ok=True)
     
@@ -67,7 +51,6 @@ def submit_defect():
         filename = lidar_file.filename
         lidar_file.save(os.path.join(upload_folder, filename))
 
-    # Save to Database
     db = get_db()
     db.execute(
         'INSERT INTO defects (project_name, unit_no, description, status) VALUES (?, ?, ?, ?)',
@@ -75,32 +58,29 @@ def submit_defect():
     )
     db.commit()
 
-    return render_template('module3/process_defect.html', 
-                           project_name=project_name, owner_name=owner_name, 
-                           unit_no=unit_no, filename=filename)
+    return render_template('module3/process_defect.html', project_name=project_name, unit_no=unit_no, filename=filename)
 
-# -------------------------------------------------
-# ROUTE 3: Evidence Report (Reads from DB)
-# -------------------------------------------------
+# 3. Evidence Report
 @bp.route('/evidence_report')
 def evidence_report():
     db = get_db()
     cur = db.execute('SELECT * FROM defects')
     defects = cur.fetchall()
     
+    draft_count = db.execute("SELECT COUNT(*) FROM defects WHERE status = 'draft'").fetchone()[0]
+    case_status = "PENDING REVIEW" if draft_count > 0 else "FINALIZED"
+
     case_info = {
         "case_id": "CASE-001",
         "client": "Abbas Abu Dzarr",
         "project": "ASMARINDA12",
-        "ai_confidence": 98,
+        "status": case_status,
         "risk_level": "High"
     }
 
     return render_template('module3/evidence_report.html', defects=defects, report=case_info)
 
-# -------------------------------------------------
-# ROUTE 4: The LOCK Action
-# -------------------------------------------------
+# 4. Lock Single Evidence
 @bp.route('/lock_evidence/<int:id>', methods=['POST'])
 def lock_evidence(id):
     db = get_db()
@@ -108,27 +88,32 @@ def lock_evidence(id):
     db.commit()
     return redirect(url_for('module3.evidence_report'))
 
-
-# ... existing lock_evidence route ...
-
-# app/module3/routes.py
-
+# 5. Validate All (Bulk Lock)
 @bp.route('/validate_all', methods=['POST'])
 def validate_all():
     db = get_db()
-    
-    # Update ALL items that are currently 'draft'
     db.execute("UPDATE defects SET status = 'locked' WHERE status = 'draft'")
     db.commit()
-    
-    # CHANGE: Redirect back to the LAWYER DASHBOARD
-    return redirect(url_for('module1.lawyer_dashboard'))
-# -------------------------------------------------
-# ROUTE 5: 3D Visualizer
-# -------------------------------------------------
+    return redirect(url_for('module3.evidence_report'))
+
+# 6. Visualizer (UPDATED BACK BUTTON LOGIC)
 @bp.route('/visualize')
 def visualize():
     filename = request.args.get('filename', 'sisiranRendered.glb') 
     project_name = request.args.get('project_name', 'Demo Project')
-    back_to = request.args.get('back_to', 'homeowner')
-    return render_template('module3/visualize.html', filename=filename, project_name=project_name, back_to=back_to)
+    
+    # Check where the user came from
+    back_to_param = request.args.get('back_to', 'homeowner')
+    
+    if back_to_param == 'developer':
+        # FIX: Send developer back to the specific project page they were on
+        back_url = url_for('module1.developer_portal', project_name=project_name)
+    elif back_to_param == 'lawyer':
+        back_url = url_for('module1.lawyer_dashboard')
+    else:
+        back_url = url_for('module1.dashboard')
+
+    return render_template('module3/visualize.html', 
+                           filename=filename, 
+                           project_name=project_name,
+                           back_url=back_url) # Pass full URL to template
