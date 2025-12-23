@@ -49,13 +49,10 @@ def login_auth():
         session['user_role'] = 'lawyer'
         session['user_name'] = 'Pn. Zulaikha'
         return redirect(url_for('module1.lawyer_dashboard'))
-    
-    # DEVELOPER: Direct to the new Command Center
     elif email == 'developer@ecoworld.com' and password == 'dev123':
         session['user_role'] = 'developer'
         session['user_name'] = 'EcoWorld Contractor'
         return redirect(url_for('module1.developer_portal'))
-        
     elif email == 'abbas@student.uum.edu.my' and password == 'password123':
         session['user_role'] = 'user'
         session['user_name'] = 'Abbas (Student)'
@@ -65,14 +62,31 @@ def login_auth():
         session['user_name'] = 'Abbas Abu Dzarr'
         return redirect(url_for('module1.dashboard'))
 
+# --- 2. SMART DASHBOARD ROUTER (THE FIX) ---
 @bp.route('/dashboard')
 def dashboard():
-    return render_template('dashboard.html', user=session.get('user_name'))
+    role = session.get('user_role')
+    
+    # If Developer -> Go to Developer Portal
+    if role == 'developer':
+        return redirect(url_for('module1.developer_portal'))
+    
+    # If Lawyer -> Go to Lawyer Console
+    elif role == 'lawyer':
+        return redirect(url_for('module1.lawyer_dashboard'))
+    
+    # Default: Homeowner Dashboard
+    db = get_db()
+    cur = db.execute("SELECT * FROM defects ORDER BY id DESC LIMIT 5")
+    recent_defects = cur.fetchall()
+    return render_template('dashboard.html', user=session.get('user_name'), defects=recent_defects)
 
+# 3. Admin Dashboard
 @bp.route('/admin')
 def admin_dashboard():
     return render_template('admin_preview.html', user="System Administrator")
 
+# 4. Lawyer Dashboard
 @bp.route('/lawyer_dashboard')
 def lawyer_dashboard():
     db = get_db()
@@ -80,7 +94,7 @@ def lawyer_dashboard():
     real_cases = cur.fetchall()
     return render_template('module1/lawyer_dashboard.html', cases=real_cases, user="Pn. Zulaikha")
 
-# --- 2. THE NEW "ALL-IN-ONE" DEVELOPER HUB ---
+# --- 5. HOUSING DEVELOPER DASHBOARD (PORTAL) ---
 @bp.route('/developer-portal')
 def developer_portal():
     if session.get('user_role') != 'developer':
@@ -88,8 +102,7 @@ def developer_portal():
     
     db = get_db()
     
-    # A. FETCH PROJECT LIST (For Sidebar)
-    # We group defects to find unique projects and count active issues
+    # Sidebar: Project List
     cur_projects = db.execute("""
         SELECT project_name, 
                COUNT(*) as total_defects,
@@ -99,13 +112,12 @@ def developer_portal():
     """)
     projects_raw = cur_projects.fetchall()
     
-    # B. DETERMINE SELECTED PROJECT
-    # If URL has ?project_name=..., use it. Otherwise default to first project.
+    # Selected Project Logic
     selected_project = request.args.get('project_name')
     if not selected_project and projects_raw:
-        selected_project = projects_raw[0]['project_name'] # Default to first
+        selected_project = projects_raw[0]['project_name'] 
     
-    # C. FETCH DEFECTS FOR SELECTED PROJECT (For Main View)
+    # Main Table: Defects List
     if selected_project:
         cur_defects = db.execute("SELECT * FROM defects WHERE status != 'draft' AND project_name = ?", (selected_project,))
     else:
@@ -113,7 +125,7 @@ def developer_portal():
         
     defects = cur_defects.fetchall()
 
-    # D. CALCULATE STATS
+    # Stats
     stats = {
         'new': sum(1 for d in defects if d['status'] == 'locked'),
         'in_progress': sum(1 for d in defects if d['status'] == 'in_progress'),
@@ -121,9 +133,7 @@ def developer_portal():
         'current_project': selected_project
     }
     
- # ... (inside developer_portal function) ...
-
-    # E. PROCESS DEFECTS (Add Severity & Filename)
+    # Process & Sort by Severity
     processed_defects = []
     for d in defects:
         d_dict = dict(d)
@@ -134,8 +144,6 @@ def developer_portal():
             d_dict['filename'] = 'sisiranRendered.glb'
         processed_defects.append(d_dict)
 
-    # --- NEW: SORT BY PRIORITY (High -> Medium -> Low) ---
-    # This changes the order, but not the UI design
     severity_order = {'High': 0, 'Medium': 1, 'Low': 2}
     processed_defects.sort(key=lambda x: severity_order.get(x['severity'], 3))
 
@@ -145,15 +153,13 @@ def developer_portal():
                            defects=processed_defects, 
                            stats=stats)
 
-# --- 3. STATUS UPDATE ROUTE ---
+# 6. Update Status Route
 @bp.route('/update_status/<int:id>/<string:new_status>')
 def update_status(id, new_status):
     if session.get('user_role') != 'developer':
         return redirect(url_for('module1.login_ui'))
         
     db = get_db()
-    
-    # Get project name to keep the view consistent
     cur = db.execute("SELECT project_name FROM defects WHERE id = ?", (id,))
     row = cur.fetchone()
     project_name = row['project_name'] if row else None
@@ -165,7 +171,7 @@ def update_status(id, new_status):
         return redirect(url_for('module1.developer_portal', project_name=project_name))
     return redirect(url_for('module1.developer_portal'))
 
-# (Legacy route for compatibility, redirects to portal)
+# Legacy Route redirect
 @bp.route('/projects')
 def my_projects():
     return redirect(url_for('module1.developer_portal'))
