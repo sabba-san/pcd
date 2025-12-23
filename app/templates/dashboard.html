@@ -53,7 +53,7 @@
                                 </div>
                                 <i class="bi bi-chevron-right text-muted"></i>
                             </div>
-                            <h4 class="fw-bold text-white mb-2">Add New defect</h4>
+                            <h4 class="fw-bold text-white mb-2">Add New Defect</h4>
                             <p class="text-white-50 small">Upload 3D model and PDF data.</p>
                         </div>
                     </div>
@@ -61,7 +61,7 @@
             </div>
 
             <div class="col-md-6">
-                <a href="{{ url_for('module3.visualize', filename='TamanMerpauhRendered.glb', project_name='My Home Demo') }}"
+                <a href="{{ url_for('module3.visualize', filename='sisiranRendered.glb', project_name='My Home Demo') }}"
                     class="text-decoration-none">
                     <div class="card h-100 p-4 border-0 hover-effect" style="background-color: #334155;">
                         <div class="card-body">
@@ -90,32 +90,41 @@
                                 <th class="ps-4 py-3 text-white-50 fw-normal small text-uppercase"
                                     style="background-color: #1e293b; border-bottom: 1px solid #475569;">Project</th>
                                 <th class="py-3 text-white-50 fw-normal small text-uppercase"
-                                    style="background-color: #1e293b; border-bottom: 1px solid #475569;">Date</th>
+                                    style="background-color: #1e293b; border-bottom: 1px solid #475569;">Defect Detail</th>
                                 <th class="py-3 text-white-50 fw-normal small text-uppercase"
                                     style="background-color: #1e293b; border-bottom: 1px solid #475569;">Status</th>
                             </tr>
                         </thead>
                         <tbody>
+                            {% for defect in defects %}
                             <tr>
                                 <td class="ps-4 fw-bold text-white"
-                                    style="background-color: #334155; border-bottom: none;">ASMARINDA12</td>
+                                    style="background-color: #334155; border-bottom: none;">
+                                    {{ defect.project_name if defect.project_name else 'General' }}
+                                </td>
                                 <td class="text-white-50 small" style="background-color: #334155; border-bottom: none;">
-                                    Today</td>
+                                    <div class="text-white">{{ defect.description }}</div>
+                                    <small class="text-white-50">Unit: {{ defect.unit_no }}</small>
+                                </td>
                                 <td style="background-color: #334155; border-bottom: none;">
-                                    <span
-                                        class="badge bg-warning bg-opacity-25 text-warning rounded-pill px-3">Processing...</span>
+                                    {% if defect.status == 'draft' %}
+                                        <span class="badge bg-secondary bg-opacity-25 text-secondary rounded-pill px-3">Draft</span>
+                                    {% elif defect.status == 'locked' %}
+                                        <span class="badge bg-warning bg-opacity-25 text-warning rounded-pill px-3">Processing...</span>
+                                    {% elif defect.status == 'in_progress' %}
+                                        <span class="badge bg-primary bg-opacity-25 text-primary rounded-pill px-3">Repairing</span>
+                                    {% elif defect.status == 'completed' %}
+                                        <span class="badge bg-success bg-opacity-25 text-success rounded-pill px-3">Resolved</span>
+                                    {% endif %}
                                 </td>
                             </tr>
+                            {% else %}
                             <tr>
-                                <td class="ps-4 fw-bold text-white"
-                                    style="background-color: #334155; border-bottom: none;">Master Bedroom Leak</td>
-                                <td class="text-white-50 small" style="background-color: #334155; border-bottom: none;">
-                                    Yesterday</td>
-                                <td style="background-color: #334155; border-bottom: none;">
-                                    <span class="badge bg-success bg-opacity-25 text-success rounded-pill px-3">PDF
-                                        Generated</span>
+                                <td colspan="3" class="text-center py-4 text-white-50" style="background-color: #334155;">
+                                    No recent activity found.
                                 </td>
                             </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>

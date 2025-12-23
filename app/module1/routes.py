@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session, g
+from flask import Blueprint, render_template, request, redirect, url_for, session, g, flash
 import sqlite3
 import os
 
@@ -13,6 +13,68 @@ def get_db():
     if db is None:
         db = g._database = sqlite3.connect(DATABASE)
         db.row_factory = sqlite3.Row
+        
+        # --- 1. AUTO-CREATE TABLES ---
+        db.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                email TEXT UNIQUE NOT NULL,
+                password TEXT NOT NULL,
+                full_name TEXT NOT NULL,
+                role TEXT DEFAULT 'user',
+                project_name TEXT
+            )
+        ''')
+
+        db.execute('''
+            CREATE TABLE IF NOT EXISTS defects (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER,
+                project_name TEXT,
+                unit_no TEXT,
+                description TEXT,
+                status TEXT DEFAULT 'draft',
+                severity TEXT DEFAULT 'Low',
+                filename TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY(user_id) REFERENCES users(id)
+            )
+        ''')
+        
+        # --- 2. AUTO-SEED USERS ---
+        cursor = db.cursor()
+        
+        # Abbas (Homeowner)
+        cursor.execute("SELECT * FROM users WHERE email = 'abbas@student.uum.edu.my'")
+        if not cursor.fetchone():
+            db.execute("INSERT INTO users (email, password, full_name, role, project_name) VALUES (?, ?, ?, ?, ?)",
+                       ('abbas@student.uum.edu.my', 'password123', 'Abbas Abu Dzarr', 'user', 'ASMARINDA12'))
+            cursor.execute("SELECT id FROM users WHERE email = 'abbas@student.uum.edu.my'")
+            abbas_id = cursor.fetchone()[0]
+            # Sample Defect
+            db.execute("INSERT INTO defects (user_id, project_name, unit_no, description, status, severity, filename) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                       (abbas_id, 'ASMARINDA12', 'A-85', 'Cracked Wall in Master Bedroom', 'in_progress', 'Medium', 'sisiranRendered.glb'))
+
+        # Developer
+        cursor.execute("SELECT * FROM users WHERE email = 'developer@ecoworld.com'")
+        if not cursor.fetchone():
+            db.execute("INSERT INTO users (email, password, full_name, role, project_name) VALUES (?, ?, ?, ?, ?)",
+                       ('developer@ecoworld.com', 'dev123', 'EcoWorld Contractor', 'developer', 'ALL'))
+
+        # Lawyer
+        cursor.execute("SELECT * FROM users WHERE email = 'lawyer@firm.com'")
+        if not cursor.fetchone():
+            db.execute("INSERT INTO users (email, password, full_name, role, project_name) VALUES (?, ?, ?, ?, ?)",
+                       ('lawyer@firm.com', 'law123', 'Pn. Zulaikha', 'lawyer', 'ALL'))
+
+        # Admin
+        cursor.execute("SELECT * FROM users WHERE email = 'admin@uum.edu.my'")
+        if not cursor.fetchone():
+            db.execute("INSERT INTO users (email, password, full_name, role, project_name) VALUES (?, ?, ?, ?, ?)",
+                       ('admin@uum.edu.my', 'admin123', 'System Administrator', 'admin', 'ALL'))
+
+        db.commit()
+
     return db
 
 @bp.teardown_request
@@ -21,157 +83,141 @@ def close_connection(exception):
     if db is not None:
         db.close()
 
-# --- HELPER: GUESS SEVERITY ---
-def estimate_severity(description):
-    desc = description.lower()
-    if 'leak' in desc or 'structural' in desc or 'roof' in desc:
-        return 'High'
-    elif 'crack' in desc:
-        return 'Medium'
-    else:
-        return 'Low'
+# --- AUTHENTICATION ---
 
-# 1. Login Routes
 @bp.route('/login', methods=['GET'])
 def login_ui():
     return render_template('login.html')
+
+@bp.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        full_name = request.form.get('full_name')
+        project_name = request.form.get('project_name')
+        
+        db = get_db()
+        try:
+            db.execute('INSERT INTO users (email, password, full_name, role, project_name) VALUES (?, ?, ?, ?, ?)',
+                       (email, password, full_name, 'user', project_name))
+            db.commit()
+            return redirect(url_for('module1.login_ui'))
+        except sqlite3.IntegrityError:
+            return "Email already exists! <a href='/login'>Try logging in</a>."
+    return render_template('register.html')
 
 @bp.route('/auth', methods=['POST'])
 def login_auth():
     email = request.form.get('email')
     password = request.form.get('password')
-
-    if email == 'admin@uum.edu.my' and password == 'admin123':
-        session['user_role'] = 'admin'
-        session['user_name'] = 'System Administrator'
-        return redirect(url_for('module1.admin_dashboard'))
-    elif email == 'lawyer@firm.com' and password == 'law123':
-        session['user_role'] = 'lawyer'
-        session['user_name'] = 'Pn. Zulaikha'
-        return redirect(url_for('module1.lawyer_dashboard'))
-    elif email == 'developer@ecoworld.com' and password == 'dev123':
-        session['user_role'] = 'developer'
-        session['user_name'] = 'EcoWorld Contractor'
-        return redirect(url_for('module1.developer_portal'))
-    elif email == 'abbas@student.uum.edu.my' and password == 'password123':
-        session['user_role'] = 'user'
-        session['user_name'] = 'Abbas (Student)'
-        return redirect(url_for('module1.dashboard'))
+    db = get_db()
+    cur = db.execute('SELECT * FROM users WHERE email = ? AND password = ?', (email, password))
+    user = cur.fetchone()
+    if user:
+        session['user_id'] = user['id']
+        session['user_role'] = user['role']
+        session['user_name'] = user['full_name']
+        session['user_project'] = user['project_name'] 
+        
+        if user['role'] == 'developer': return redirect(url_for('module1.developer_portal'))
+        elif user['role'] == 'lawyer': return redirect(url_for('module1.lawyer_dashboard'))
+        elif user['role'] == 'admin': return redirect(url_for('module1.admin_dashboard'))
+        else: return redirect(url_for('module1.dashboard'))
     else:
-        session['user_role'] = 'user'
-        session['user_name'] = 'Abbas Abu Dzarr'
-        return redirect(url_for('module1.dashboard'))
+        return "Invalid Credentials. <a href='/login'>Try Again</a>"
 
-# --- 2. SMART DASHBOARD ROUTER (THE FIX) ---
+@bp.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('module1.login_ui'))
+
+# --- DASHBOARDS ---
+
 @bp.route('/dashboard')
 def dashboard():
     role = session.get('user_role')
-    
-    # If Developer -> Go to Developer Portal
-    if role == 'developer':
-        return redirect(url_for('module1.developer_portal'))
-    
-    # If Lawyer -> Go to Lawyer Console
-    elif role == 'lawyer':
-        return redirect(url_for('module1.lawyer_dashboard'))
-    
-    # Default: Homeowner Dashboard
+    if role == 'developer': return redirect(url_for('module1.developer_portal'))
+    if role == 'lawyer': return redirect(url_for('module1.lawyer_dashboard'))
+    if 'user_id' not in session: return redirect(url_for('module1.login_ui'))
+
     db = get_db()
-    cur = db.execute("SELECT * FROM defects ORDER BY id DESC LIMIT 5")
+    cur = db.execute("SELECT * FROM defects WHERE user_id = ? ORDER BY id DESC LIMIT 5", (session['user_id'],))
     recent_defects = cur.fetchall()
     return render_template('dashboard.html', user=session.get('user_name'), defects=recent_defects)
 
-# 3. Admin Dashboard
-@bp.route('/admin')
-def admin_dashboard():
-    return render_template('admin_preview.html', user="System Administrator")
-
-# 4. Lawyer Dashboard
-@bp.route('/lawyer_dashboard')
-def lawyer_dashboard():
-    db = get_db()
-    cur = db.execute('SELECT * FROM defects')
-    real_cases = cur.fetchall()
-    return render_template('module1/lawyer_dashboard.html', cases=real_cases, user="Pn. Zulaikha")
-
-# --- 5. HOUSING DEVELOPER DASHBOARD (PORTAL) ---
 @bp.route('/developer-portal')
 def developer_portal():
-    if session.get('user_role') != 'developer':
-        return redirect(url_for('module1.login_ui'))
+    if session.get('user_role') != 'developer': return redirect(url_for('module1.login_ui'))
     
     db = get_db()
+    selected_project = request.args.get('project_name')
     
-    # Sidebar: Project List
+    # --- FIX IS HERE: Changed 'as active' to 'as active_count' ---
     cur_projects = db.execute("""
         SELECT project_name, 
-               COUNT(*) as total_defects,
-               SUM(CASE WHEN status != 'completed' THEN 1 ELSE 0 END) as active_count
+               COUNT(*) as total, 
+               SUM(CASE WHEN status != 'completed' THEN 1 ELSE 0 END) as active_count 
         FROM defects 
         GROUP BY project_name
     """)
     projects_raw = cur_projects.fetchall()
     
-    # Selected Project Logic
-    selected_project = request.args.get('project_name')
-    if not selected_project and projects_raw:
-        selected_project = projects_raw[0]['project_name'] 
+    if not selected_project and projects_raw: selected_project = projects_raw[0]['project_name']
     
-    # Main Table: Defects List
+    query = "SELECT * FROM defects WHERE status != 'draft'"
+    params = []
     if selected_project:
-        cur_defects = db.execute("SELECT * FROM defects WHERE status != 'draft' AND project_name = ?", (selected_project,))
-    else:
-        cur_defects = db.execute("SELECT * FROM defects WHERE status != 'draft'")
-        
+        query += " AND project_name = ?"
+        params.append(selected_project)
+    
+    cur_defects = db.execute(query, params)
     defects = cur_defects.fetchall()
-
-    # Stats
+    
+    processed_defects = [dict(d) for d in defects]
+    
+    def get_severity_score(d):
+        desc = d['description'].lower() if d['description'] else ""
+        if 'leak' in desc or 'structural' in desc: return 0 
+        if 'crack' in desc: return 1
+        return 2 
+    processed_defects.sort(key=get_severity_score)
+    
     stats = {
-        'new': sum(1 for d in defects if d['status'] == 'locked'),
-        'in_progress': sum(1 for d in defects if d['status'] == 'in_progress'),
-        'completed': sum(1 for d in defects if d['status'] == 'completed'),
-        'current_project': selected_project
+        'new': sum(1 for d in processed_defects if d['status'] == 'locked'),
+        'in_progress': sum(1 for d in processed_defects if d['status'] == 'in_progress'),
+        'completed': sum(1 for d in processed_defects if d['status'] == 'completed'),
+        'current_project': selected_project or "All"
     }
     
-    # Process & Sort by Severity
-    processed_defects = []
-    for d in defects:
-        d_dict = dict(d)
-        d_dict['severity'] = estimate_severity(d['description'])
-        if "Uploaded: " in d['description']:
-            d_dict['filename'] = d['description'].split("Uploaded: ")[1]
-        else:
-            d_dict['filename'] = 'sisiranRendered.glb'
-        processed_defects.append(d_dict)
-
-    severity_order = {'High': 0, 'Medium': 1, 'Low': 2}
-    processed_defects.sort(key=lambda x: severity_order.get(x['severity'], 3))
-
     return render_template('developer_portal.html', 
                            user=session.get('user_name'), 
-                           projects=projects_raw,
+                           projects=projects_raw, 
                            defects=processed_defects, 
                            stats=stats)
 
-# 6. Update Status Route
+@bp.route('/lawyer_dashboard')
+def lawyer_dashboard():
+    if session.get('user_role') != 'lawyer': return redirect(url_for('module1.login_ui'))
+    db = get_db()
+    cur = db.execute('SELECT * FROM defects')
+    cases = cur.fetchall()
+    return render_template('module1/lawyer_dashboard.html', cases=cases, user=session.get('user_name'))
+
 @bp.route('/update_status/<int:id>/<string:new_status>')
 def update_status(id, new_status):
-    if session.get('user_role') != 'developer':
-        return redirect(url_for('module1.login_ui'))
-        
+    if session.get('user_role') != 'developer': return redirect(url_for('module1.login_ui'))
     db = get_db()
-    cur = db.execute("SELECT project_name FROM defects WHERE id = ?", (id,))
-    row = cur.fetchone()
-    project_name = row['project_name'] if row else None
-    
     db.execute("UPDATE defects SET status = ? WHERE id = ?", (new_status, id))
     db.commit()
-    
-    if project_name:
-        return redirect(url_for('module1.developer_portal', project_name=project_name))
     return redirect(url_for('module1.developer_portal'))
 
-# Legacy Route redirect
+@bp.route('/admin')
+def admin_dashboard():
+    return render_template('admin_preview.html', user="System Administrator")
+
 @bp.route('/projects')
 def my_projects():
-    return redirect(url_for('module1.developer_portal'))
+    if session.get('user_role') == 'developer':
+        return redirect(url_for('module1.developer_portal'))
+    return redirect(url_for('module1.dashboard'))
