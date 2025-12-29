@@ -222,6 +222,7 @@ def developer_portal():
     db = get_db()
     selected_project = request.args.get('project_name')
     
+    # Sidebar Stats
     cur_projects = db.execute("""
         SELECT project_name, 
                COUNT(*) as total, 
@@ -231,13 +232,19 @@ def developer_portal():
     """)
     projects_raw = cur_projects.fetchall()
     
-    # Default to first project if none selected
     if not selected_project and projects_raw: selected_project = projects_raw[0]['project_name']
     
-    query = "SELECT * FROM defects WHERE status != 'draft'"
+    # --- UPDATED QUERY: Join Users & Show ALL statuses (including drafts) ---
+    query = """
+        SELECT defects.*, users.full_name 
+        FROM defects 
+        LEFT JOIN users ON defects.user_id = users.id
+        WHERE 1=1
+    """
     params = []
+    
     if selected_project:
-        query += " AND project_name = ?"
+        query += " AND defects.project_name = ?"
         params.append(selected_project)
     
     cur_defects = db.execute(query, params)
@@ -252,8 +259,9 @@ def developer_portal():
         return 2 
     processed_defects.sort(key=get_severity_score)
     
+    # Update Stats to include 'draft' as 'new'
     stats = {
-        'new': sum(1 for d in processed_defects if d['status'] == 'locked'),
+        'new': sum(1 for d in processed_defects if d['status'] in ['locked', 'draft']),
         'in_progress': sum(1 for d in processed_defects if d['status'] == 'in_progress'),
         'completed': sum(1 for d in processed_defects if d['status'] == 'completed'),
         'current_project': selected_project or "All"
@@ -264,7 +272,6 @@ def developer_portal():
                            projects=projects_raw, 
                            defects=processed_defects, 
                            stats=stats)
-
 @bp.route('/lawyer_dashboard')
 def lawyer_dashboard():
     if session.get('user_role') != 'lawyer': return redirect(url_for('module1.login_ui'))
@@ -292,5 +299,26 @@ def my_projects():
     
     if 'user_id' not in session: return redirect(url_for('module1.login_ui'))
     
-    # Render the Projects Template instead of redirecting
-    return render_template('module1/projects.html', user=session.get('user_name'))
+    db = get_db()
+    # 1. Fetch the logged-in user's defects (Projects)
+    cur = db.execute("SELECT * FROM defects WHERE user_id = ? ORDER BY created_at DESC", (session['user_id'],))
+    rows = cur.fetchall()
+    
+    # 2. Format the data to match what projects.html expects
+    projects_list = []
+    for row in rows:
+        projects_list.append({
+            'name': row['project_name'],
+            'id': row['id'],
+            'status': row['status'].title(),  # e.g., 'Draft', 'Processing'
+            'date': row['created_at'].split(' ')[0] if row['created_at'] else 'N/A', # Show YYYY-MM-DD
+            'unit': row['unit_no'],
+            'address': row['description'][:50] + "..." if row['description'] else "No description", # Use description as address/details
+            'defects': 1, # Assuming 1 report = 1 set of defects
+            'filename': row['filename']
+        })
+    
+    # 3. Pass the 'projects' list to the template
+    return render_template('module1/projects.html', 
+                           user=session.get('user_name'), 
+                           projects=projects_list)
