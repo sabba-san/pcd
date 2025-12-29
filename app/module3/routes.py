@@ -27,7 +27,7 @@ def insert_defect():
     user_project = session.get('user_project', '')
     return render_template('module3/insert_defect.html', user_project=user_project)
 
-# 2. Submit Defect (NOW LINKS TO USER_ID)
+# 2. Submit Defect (With Action Logic)
 @bp.route('/submit_defect', methods=['POST'])
 def submit_defect():
     # Security: Ensure user is logged in
@@ -36,6 +36,7 @@ def submit_defect():
         
     project_name = request.form.get('project_name')
     unit_no = request.form.get('unit_no')
+    action = request.form.get('action')  # Capture button value
     
     upload_folder = os.path.join(os.getcwd(), 'app', 'static', 'uploads')
     os.makedirs(upload_folder, exist_ok=True)
@@ -46,8 +47,17 @@ def submit_defect():
         filename = lidar_file.filename
         lidar_file.save(os.path.join(upload_folder, filename))
 
+    # --- LOGIC: Preview vs Submit ---
+    if action == 'visualize':
+        # PREVIEW MODE: Redirect to visualizer with 'back_to=insert'
+        # This tells the visualizer to go back to the FORM, not the dashboard
+        return redirect(url_for('module3.visualize', 
+                                filename=filename, 
+                                project_name=project_name,
+                                back_to='insert'))
+
+    # SUBMIT MODE: Insert into Database
     db = get_db()
-    # Insert with USER_ID
     db.execute(
         'INSERT INTO defects (user_id, project_name, unit_no, description, status, filename) VALUES (?, ?, ?, ?, ?, ?)',
         (session['user_id'], project_name, unit_no, f"Uploaded: {filename}", 'draft', filename)
@@ -113,17 +123,21 @@ def validate_all():
     db.commit()
     return redirect(url_for('module3.evidence_report'))
 
-# 6. Visualizer
+# 6. Visualizer (Updated with 'insert' logic)
 @bp.route('/visualize')
 def visualize():
     filename = request.args.get('filename', 'sisiranRendered.glb') 
     project_name = request.args.get('project_name', 'Demo Project')
     back_to_param = request.args.get('back_to', 'homeowner')
     
+    # --- LOGIC: Determine Back Button Destination ---
     if back_to_param == 'developer':
         back_url = url_for('module1.developer_portal', project_name=project_name)
     elif back_to_param == 'lawyer':
         back_url = url_for('module1.lawyer_dashboard')
+    elif back_to_param == 'insert':
+        # NEW: Go back to the Insert Defect Form
+        back_url = url_for('module3.insert_defect')
     else:
         back_url = url_for('module1.dashboard')
 

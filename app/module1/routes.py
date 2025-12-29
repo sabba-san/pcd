@@ -289,4 +289,8 @@ def admin_dashboard():
 def my_projects():
     if session.get('user_role') == 'developer':
         return redirect(url_for('module1.developer_portal'))
-    return redirect(url_for('module1.dashboard'))
+    
+    if 'user_id' not in session: return redirect(url_for('module1.login_ui'))
+    
+    # Render the Projects Template instead of redirecting
+    return render_template('module1/projects.html', user=session.get('user_name'))
