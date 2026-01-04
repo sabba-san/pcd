@@ -292,6 +292,8 @@ def update_status(id, new_status):
 def admin_dashboard():
     return render_template('admin_preview.html', user="System Administrator")
 
+# --- UPDATE THIS FUNCTION IN app/module1/routes.py ---
+
 @bp.route('/projects')
 def my_projects():
     if session.get('user_role') == 'developer':
@@ -300,25 +302,50 @@ def my_projects():
     if 'user_id' not in session: return redirect(url_for('module1.login_ui'))
     
     db = get_db()
-    # 1. Fetch the logged-in user's defects (Projects)
+    projects_list = []
+    
+    # 1. FETCH DATABASE PROJECTS
+    # --------------------------
     cur = db.execute("SELECT * FROM defects WHERE user_id = ? ORDER BY created_at DESC", (session['user_id'],))
     rows = cur.fetchall()
     
-    # 2. Format the data to match what projects.html expects
-    projects_list = []
+    # Track filenames we found in DB so we don't list them twice
+    db_filenames = set()
+
     for row in rows:
+        db_filenames.add(row['filename'])
         projects_list.append({
             'name': row['project_name'],
             'id': row['id'],
-            'status': row['status'].title(),  # e.g., 'Draft', 'Processing'
-            'date': row['created_at'].split(' ')[0] if row['created_at'] else 'N/A', # Show YYYY-MM-DD
+            'status': row['status'].title(),
+            'date': row['created_at'].split(' ')[0] if row['created_at'] else 'N/A',
             'unit': row['unit_no'],
-            'address': row['description'][:50] + "..." if row['description'] else "No description", # Use description as address/details
-            'defects': 1, # Assuming 1 report = 1 set of defects
+            'address': row['description'][:50] + "..." if row['description'] else "No description",
+            'defects': 1,
             'filename': row['filename']
         })
     
-    # 3. Pass the 'projects' list to the template
+    # 2. AUTO-DETECT FILES IN FOLDER
+    # ------------------------------
+    # This looks inside 'app/static/uploads' for any extra .glb files
+    upload_folder = os.path.join(os.getcwd(), 'app', 'static', 'uploads')
+    
+    if os.path.exists(upload_folder):
+        for fname in os.listdir(upload_folder):
+            # If it's a 3D file AND not already in the database list
+            if fname.lower().endswith('.glb') and fname not in db_filenames:
+                projects_list.append({
+                    'name': fname.replace('.glb', '').replace('_', ' ').title(), # Make a pretty name
+                    'id': 999, # Fake ID for files not in DB
+                    'status': 'Ready to View',
+                    'date': 'Detected File',
+                    'unit': 'Storage',
+                    'address': 'File found in /static/uploads',
+                    'defects': 'N/A',
+                    'filename': fname
+                })
+
+    # 3. RENDER THE LIST
     return render_template('module1/projects.html', 
                            user=session.get('user_name'), 
                            projects=projects_list)
